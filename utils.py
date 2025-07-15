@@ -114,3 +114,35 @@ def plot_shot_prob_by_distance(df):
     plt.grid(axis='y', alpha=0.75)
     plt.legend()
     plt.show()
+
+# Plot Shot Expected Value by Distance
+def plot_shot_EV_by_distance(df):
+    shot_distances = df["SHOT_DISTANCE"].to_numpy()
+    unique_distances = np.unique(shot_distances)
+    probabilities = [calculate_shot_probability(df, d, d) for d in unique_distances]
+    EVs = [p * (3 if d >= 23 else 2) for d, p in zip(unique_distances, probabilities)]
+    plt.figure(figsize=(10, 6))
+    plt.bar(unique_distances, EVs, width=1, color='blue')
+    plt.axvline(x=22, color='red', linestyle='--', linewidth=2, label='3PT Corner (22 ft)')
+    plt.axvline(x=23.75, color='orange', linestyle='--', linewidth=2, label='3PT Arc (23.75 ft)')
+    plt.title("Shot Expected Value by Distance")
+    plt.xlabel("Shot Distance (ft)")
+    plt.ylabel("Shot EV")
+    plt.xlim(0,94)
+    plt.grid(axis='y', alpha=0.75)
+    plt.legend()
+    plt.show()
+
+# Returns deserved points for given shot length given a target EV
+def get_deserved_points(df, d1, d2, target_EV, print_bool=False):
+    num_shots = calculate_num_shots(df, d1, d2)
+    if print_bool: print(f"Number of shots from {d1} to {d2}ft: {num_shots}")
+    shot_prob = calculate_shot_probability(df, d1, d2)
+    if print_bool: print(f"Probability from {d1} to {d2}ft: {shot_prob*100:.4f}%")
+    if shot_prob > 0:
+        deserved_points = target_EV / shot_prob
+        print(f"Deserved points for Target EV of {target_EV}: {deserved_points}")
+        return deserved_points
+    else:
+        print("Divide by 0 Error, Worth Infinite Points, Returning -1")
+        return -1
