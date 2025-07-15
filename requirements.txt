@@ -1,0 +1,7 @@
+nba_api
+pyarrow
+polars
+dagster
+dagster-webserver
+dagit
+matplotlib

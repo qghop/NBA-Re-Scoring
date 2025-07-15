@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.dagster]
+module_name = "nba_shots_pipeline"
+
+[tool.poetry.dependencies]
+nba-api = "^1.10"
+pandas = "^2.3"
+pyarrow = "^20.0"
+polars = "^1.31"
+dagster = "^1.6"
