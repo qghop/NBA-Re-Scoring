@@ -141,8 +141,35 @@ def get_deserved_points(df, d1, d2, target_EV, print_bool=False):
     if print_bool: print(f"Probability from {d1} to {d2}ft: {shot_prob*100:.4f}%")
     if shot_prob > 0:
         deserved_points = target_EV / shot_prob
-        print(f"Deserved points for Target EV of {target_EV}: {deserved_points}")
+        if print_bool: print(f"Deserved points for Target EV of {target_EV}: {deserved_points}")
         return deserved_points
     else:
-        print("Divide by 0 Error, Worth Infinite Points, Returning -1")
+        if print_bool: print("Divide by 0 Error, Worth Infinite Points, Returning -1")
         return -1
+
+# Returns best distance for a _pt line given a target EV
+def get_point_distance(df, deserved_points, target_EV, graph_bool=False, print_bool=False):
+    best_diff = 999
+    best_dist = -1
+    distances = list(range(0,95))
+    EVs = []
+    for dist in distances:
+        current_EV = calculate_shot_probability(df, dist, 200) * deserved_points
+        EVs.append(current_EV)
+        diff = abs(current_EV - target_EV)
+        if diff < best_diff:
+            best_diff = diff
+            best_dist = dist
+    if print_bool: print(f"Best Distance for {deserved_points} Point Line (Target EV {target_EV}): {best_dist}")
+    if graph_bool:
+        plt.figure(figsize=(10,6))
+        plt.plot(distances, EVs, color='b')
+        plt.axhline(y=target_EV, color='r', linestyle='--', linewidth=2, label=f'Target EV: {target_EV}')
+        plt.vlines(x=best_dist, ymin=0, ymax=target_EV, color='g', linestyle='--', linewidth=2, label=f'Best Distance: {best_dist}ft')
+        plt.legend()
+        plt.title(f"Expected Value of {deserved_points}Pt Line by Distance")
+        plt.xlabel("Line Distance (ft)")
+        plt.ylabel("Shot EV")
+        plt.ylim(bottom=0)
+        plt.show()
+    return best_dist
